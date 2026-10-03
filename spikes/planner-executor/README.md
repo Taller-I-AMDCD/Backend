@@ -87,3 +87,26 @@ Desde la carpeta `spikes/planner-executor`, la validación y la demostración se
 python -m pytest tests -v
 python -m src.demo_executor
 ```
+
+## Rule-based Planner
+
+El Planner selecciona de forma determinista la siguiente operación analítica sin ejecutar cálculos. Recibe un estado de investigación con el objetivo, la iteración, las columnas disponibles, las variables numéricas, el par objetivo explícito, el historial y los resultados anteriores.
+
+Su salida es una decisión serializable a JSON: una acción con herramienta, parámetros y razón explicable, o una decisión de parada. Las reglas se evalúan en este orden:
+
+1. perfilado cuando no existe metadata suficiente;
+2. correlación de Pearson para el par objetivo;
+3. correlación parcial para la primera variable numérica candidata ordenada;
+4. contraste de sensibilidad a outliers;
+5. correlación de Spearman como métrica alternativa;
+6. parada cuando no existen acciones nuevas o se alcanza el límite de iteraciones.
+
+La correlación inicial se considera relevante cuando su valor absoluto es al menos `0.5`. La selección de la primera candidata ordenada es una simplificación determinista del Spike cuando existen múltiples variables de control posibles.
+
+El Planner decide qué operación solicitar. El Executor valida y ejecuta únicamente la operación autorizada. En esta etapa ambos componentes permanecen aislados y no existe todavía un ciclo integrado.
+
+La demostración independiente del Planner se ejecuta desde `spikes/planner-executor`:
+
+```text
+python -m src.demo_planner
+```
