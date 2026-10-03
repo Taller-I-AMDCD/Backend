@@ -57,3 +57,33 @@ El Spike incluye tres datasets sintéticos reproducibles que funcionan como banc
 - **Sensibilidad a outliers:** presenta una asociación base débil o moderada cuya estimación global cambia ante un pequeño grupo de observaciones extremas.
 
 Estos escenarios describen condiciones experimentales controladas y no contienen resultados finales sobre el desempeño de la arquitectura.
+
+## Analytical Executor
+
+El Executor recibe solicitudes estructuradas y ejecuta operaciones analíticas sin decidir qué análisis debe realizarse. Esta separación mantiene la decisión fuera de la capa de ejecución y limita cada solicitud a un catálogo explícito de herramientas autorizadas.
+
+Una solicitud indica el nombre de la herramienta y sus parámetros:
+
+```json
+{
+  "tool": "pearson_correlation",
+  "parameters": {"x": "X", "y": "Y"}
+}
+```
+
+La respuesta informa el estado, la herramienta, los parámetros, el resultado o un error estructurado. Ambos formatos son serializables a JSON.
+
+El catálogo permite actualmente:
+
+- perfilado de datasets;
+- correlaciones de Pearson, Spearman y parcial con una variable de control;
+- detección de outliers mediante IQR;
+- comparación de correlaciones antes y después de retirar outliers;
+- análisis de correlación por subgrupos.
+
+Desde la carpeta `spikes/planner-executor`, la validación y la demostración se ejecutan con:
+
+```text
+python -m pytest tests -v
+python -m src.demo_executor
+```
