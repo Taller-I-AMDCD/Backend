@@ -1,0 +1,33 @@
+# Python environments
+.venv/
+venv/
+
+# Python cache and test artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+*.log
+logs/
+
+# Local IDE settings
+.idea/
+.vscode/
+
+# Operating system files
+.DS_Store
+Thumbs.db
