@@ -47,3 +47,13 @@ El Planner produce una representación del trabajo requerido. El Executor consum
 - Extensibilidad para incorporar nuevas herramientas.
 - Sobrecarga técnica introducida por el patrón.
 - Adecuación para flujos de análisis causal reproducibles.
+
+## Evaluation scenarios
+
+El Spike incluye tres datasets sintéticos reproducibles que funcionan como banco experimental común para comparar posteriormente el comportamiento de la arquitectura Planner–Executor:
+
+- **Relación consistente:** presenta una asociación positiva clara y estable entre `X` e `Y`, acompañada de ruido moderado.
+- **Confusión:** presenta una asociación entre `X` e `Y` explicada principalmente por la influencia compartida de `Z`.
+- **Sensibilidad a outliers:** presenta una asociación base débil o moderada cuya estimación global cambia ante un pequeño grupo de observaciones extremas.
+
+Estos escenarios describen condiciones experimentales controladas y no contienen resultados finales sobre el desempeño de la arquitectura.

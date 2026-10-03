@@ -1,0 +1,42 @@
+{
+  "seed": 42,
+  "scenarios": [
+    {
+      "id": "consistent_relation",
+      "name": "Consistent relation",
+      "file": "consistent_relation.csv",
+      "records": 500,
+      "variables": [
+        "X",
+        "Y"
+      ],
+      "purpose": "Evaluate the stability of a direct association.",
+      "expected_behavior": "X and Y exhibit a clear positive association that remains stable across the sample."
+    },
+    {
+      "id": "confounded_relation",
+      "name": "Confounded relation",
+      "file": "confounded_relation.csv",
+      "records": 500,
+      "variables": [
+        "X",
+        "Y",
+        "Z"
+      ],
+      "purpose": "Evaluate an association explained primarily by a confounder.",
+      "expected_behavior": "The apparent X–Y association decreases substantially after controlling for Z."
+    },
+    {
+      "id": "outlier_relation",
+      "name": "Outlier-sensitive relation",
+      "file": "outlier_relation.csv",
+      "records": 500,
+      "variables": [
+        "X",
+        "Y"
+      ],
+      "purpose": "Evaluate sensitivity of an association to extreme values.",
+      "expected_behavior": "A small extreme subset materially changes the global X–Y association."
+    }
+  ]
+}
