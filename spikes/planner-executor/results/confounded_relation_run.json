@@ -270,6 +270,7 @@
     "total_iterations": 5,
     "successful_executions": 5,
     "failed_executions": 0,
+    "duplicate_actions_prevented": 0,
     "tools_used": [
       "profile_dataset",
       "pearson_correlation",

@@ -1,0 +1,44 @@
+{
+  "dataset": "in_memory_invalid_tool",
+  "objective": "Evaluate the association between X and Y.",
+  "target_variables": {
+    "x": "X",
+    "y": "Y"
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "planner": {
+        "action_id": "action-001",
+        "tool": "unsupported_tool",
+        "parameters": {},
+        "reason": "Demonstrate an orchestration safeguard."
+      },
+      "executor": {
+        "status": "error",
+        "tool": "unsupported_tool",
+        "parameters": {},
+        "result": null,
+        "error": {
+          "code": "UNKNOWN_TOOL",
+          "message": "Tool 'unsupported_tool' is not registered."
+        }
+      },
+      "state": {
+        "iteration": 1,
+        "columns": [],
+        "numeric_columns": [],
+        "history_size": 1,
+        "results_size": 1
+      }
+    }
+  ],
+  "final": {
+    "stop_reason": "EXECUTION_ERROR",
+    "total_iterations": 1,
+    "successful_executions": 0,
+    "failed_executions": 1,
+    "duplicate_actions_prevented": 0,
+    "tools_used": []
+  }
+}

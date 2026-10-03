@@ -10,6 +10,7 @@ from typing import Any
 
 import pandas as pd
 
+from .contracts import StopReason
 from .executor import Executor
 from .planner import Planner, ResearchState
 
@@ -49,12 +50,50 @@ class Orchestrator:
         iterations: list[dict[str, Any]] = []
         successful_executions = 0
         failed_executions = 0
-        stop_reason = "NO_NEW_ACTIONS"
+        duplicate_actions_prevented = 0
+        stop_reason = StopReason.NO_NEW_ACTIONS.value
+        executed_action_identities: set[str] = set()
+        tools_used: list[str] = []
 
         while True:
+            if len(iterations) >= max_iterations:
+                stop_reason = StopReason.MAX_ITERATIONS.value
+                break
+
             decision = self._planner.plan(state)
             if decision["status"] == "stop":
                 stop_reason = decision["reason"]
+                break
+
+            iteration_number = len(iterations) + 1
+            action_identity = self._action_identity(
+                decision["tool"], decision["parameters"]
+            )
+            if action_identity in executed_action_identities:
+                duplicate_actions_prevented += 1
+                iterations.append(
+                    {
+                        "iteration": iteration_number,
+                        "planner": {
+                            "action_id": decision["action_id"],
+                            "tool": decision["tool"],
+                            "parameters": decision["parameters"],
+                            "reason": decision["reason"],
+                        },
+                        "executor": {
+                            "status": "skipped",
+                            "tool": decision["tool"],
+                            "parameters": decision["parameters"],
+                            "result": None,
+                            "error": {
+                                "code": "DUPLICATE_ACTION",
+                                "message": "Duplicate action blocked before execution.",
+                            },
+                        },
+                        "state": self._state_snapshot(state),
+                    }
+                )
+                stop_reason = StopReason.NO_NEW_ACTIONS.value
                 break
 
             response = self._executor.execute(
@@ -66,14 +105,14 @@ class Orchestrator:
             )
             history_entry = {
                 "action_id": decision["action_id"],
-                "iteration": decision["iteration"],
+                "iteration": iteration_number,
                 "tool": decision["tool"],
                 "parameters": decision["parameters"],
                 "reason": decision["reason"],
             }
             result_entry = {
                 "action_id": decision["action_id"],
-                "iteration": decision["iteration"],
+                "iteration": iteration_number,
                 "tool": response["tool"],
                 "parameters": response["parameters"],
                 "status": response["status"],
@@ -88,7 +127,7 @@ class Orchestrator:
 
             state = replace(
                 state,
-                iteration=decision["iteration"],
+                iteration=iteration_number,
                 columns=columns,
                 numeric_columns=numeric_columns,
                 history=[*state.history, history_entry],
@@ -96,7 +135,7 @@ class Orchestrator:
             )
             iterations.append(
                 {
-                    "iteration": decision["iteration"],
+                    "iteration": iteration_number,
                     "planner": {
                         "action_id": decision["action_id"],
                         "tool": decision["tool"],
@@ -104,21 +143,17 @@ class Orchestrator:
                         "reason": decision["reason"],
                     },
                     "executor": response,
-                    "state": {
-                        "iteration": state.iteration,
-                        "columns": state.columns,
-                        "numeric_columns": state.numeric_columns,
-                        "history_size": len(state.history),
-                        "results_size": len(state.results),
-                    },
+                    "state": self._state_snapshot(state),
                 }
             )
+            executed_action_identities.add(action_identity)
 
             if response["status"] == "success":
                 successful_executions += 1
+                tools_used.append(decision["tool"])
             else:
                 failed_executions += 1
-                stop_reason = "EXECUTION_ERROR"
+                stop_reason = StopReason.EXECUTION_ERROR.value
                 break
 
         return {
@@ -131,10 +166,29 @@ class Orchestrator:
                 "total_iterations": len(iterations),
                 "successful_executions": successful_executions,
                 "failed_executions": failed_executions,
-                "tools_used": [
-                    iteration["planner"]["tool"] for iteration in iterations
-                ],
+                "duplicate_actions_prevented": duplicate_actions_prevented,
+                "tools_used": tools_used,
             },
+        }
+
+    @staticmethod
+    def _action_identity(tool: str, parameters: Mapping[str, Any]) -> str:
+        normalized_parameters = json.dumps(
+            parameters,
+            sort_keys=True,
+            separators=(",", ":"),
+            default=repr,
+        )
+        return f"{tool}:{normalized_parameters}"
+
+    @staticmethod
+    def _state_snapshot(state: ResearchState) -> dict[str, Any]:
+        return {
+            "iteration": state.iteration,
+            "columns": state.columns,
+            "numeric_columns": state.numeric_columns,
+            "history_size": len(state.history),
+            "results_size": len(state.results),
         }
 
     @staticmethod

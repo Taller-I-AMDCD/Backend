@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Literal, Mapping, TypedDict
 
+from .contracts import StopReason
+
 ASSOCIATION_THRESHOLD = 0.5
 
 PROFILE_TOOL = "profile_dataset"
@@ -52,7 +54,7 @@ class Planner:
     def plan(self, state: ResearchState) -> PlannerDecision:
         """Return one structured action or an explicit stop decision."""
         if state.iteration >= state.max_iterations:
-            return self._stop(state, "MAX_ITERATIONS")
+            return self._stop(state, StopReason.MAX_ITERATIONS)
 
         numeric_columns = self._effective_numeric_columns(state)
         if not numeric_columns:
@@ -64,11 +66,11 @@ class Planner:
                     "Obtain the initial dataset structure before selecting "
                     "statistical analyses.",
                 )
-            return self._stop(state, "NO_NEW_ACTIONS")
+            return self._stop(state, StopReason.NO_NEW_ACTIONS)
 
         targets = self._target_pair(state, numeric_columns)
         if targets is None:
-            return self._stop(state, "NO_NEW_ACTIONS")
+            return self._stop(state, StopReason.NO_NEW_ACTIONS)
         x, y = targets
         pair_parameters = {"x": x, "y": y}
 
@@ -84,9 +86,9 @@ class Planner:
         pearson_result = self._find_result(state, PEARSON_TOOL, pair_parameters)
         coefficient = self._coefficient(pearson_result)
         if coefficient is None:
-            return self._stop(state, "NO_NEW_ACTIONS")
+            return self._stop(state, StopReason.NO_NEW_ACTIONS)
         if abs(coefficient) < ASSOCIATION_THRESHOLD:
-            return self._stop(state, "SUFFICIENT_EVIDENCE")
+            return self._stop(state, StopReason.SUFFICIENT_EVIDENCE)
 
         candidates = sorted(set(numeric_columns) - {x, y})
         if candidates:
@@ -117,7 +119,7 @@ class Planner:
                 "Contrast association stability using a rank-based metric.",
             )
 
-        return self._stop(state, "NO_NEW_ACTIONS")
+        return self._stop(state, StopReason.NO_NEW_ACTIONS)
 
     @staticmethod
     def _effective_numeric_columns(state: ResearchState) -> list[str]:
@@ -223,5 +225,9 @@ class Planner:
         }
 
     @staticmethod
-    def _stop(state: ResearchState, reason: str) -> StopDecision:
-        return {"status": "stop", "iteration": state.iteration, "reason": reason}
+    def _stop(state: ResearchState, reason: StopReason) -> StopDecision:
+        return {
+            "status": "stop",
+            "iteration": state.iteration,
+            "reason": reason.value,
+        }

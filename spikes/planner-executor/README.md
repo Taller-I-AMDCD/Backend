@@ -130,3 +130,17 @@ python -m src.main --dataset data/confounded_relation.csv --x X --y Y
 ```
 
 El límite puede ajustarse con `--max-iterations`; su valor predeterminado es `8`. Esta integración recopila evidencia analítica y no asigna clasificaciones finales a las relaciones estudiadas.
+
+## Execution safeguards
+
+El ciclo aplica el límite `max_iterations` tanto en el Planner como defensivamente en el orquestador. El orquestador también normaliza `tool + parameters` para bloquear solicitudes duplicadas antes de invocar nuevamente al Executor.
+
+Los errores estructurados del Executor se conservan en la iteración correspondiente, incrementan las métricas de fallo y detienen el ciclo con `EXECUTION_ERROR`. Las trazas acumuladas, incluidas las ejecuciones fallidas, pueden persistirse como JSON para su auditoría.
+
+El CLI rechaza de forma controlada archivos inexistentes o vacíos, targets ausentes o no numéricos, variables objetivo idénticas y límites de iteración inválidos. Estos errores esperables producen un mensaje breve y un código de salida distinto de cero, sin ocultar fallos inesperados de programación.
+
+Las defensas pueden demostrarse de manera aislada con:
+
+```text
+python -m src.demo_robustness
+```
