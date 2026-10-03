@@ -1,0 +1,247 @@
+{
+  "environment": {
+    "python_version": "3.12.14",
+    "operating_system": "Windows",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "AMD64 Family 25 Model 80 Stepping 0, AuthenticAMD",
+    "warmup_runs": 3,
+    "measured_runs": 20
+  },
+  "protocol": {
+    "target_x": "X",
+    "target_y": "Y",
+    "expected_rows_per_scenario": 500,
+    "warmup_runs": 3,
+    "measured_runs": 20,
+    "max_iterations": 8,
+    "timing_scope": "In-memory Planner-Executor orchestration",
+    "functional_reproducibility_required": true
+  },
+  "scenarios": [
+    {
+      "scenario": "consistent_relation",
+      "rows": 500,
+      "expected_behavior": "The X-Y association remains strong across robustness checks.",
+      "correct_behavior_detected": true,
+      "functional_reproducibility": true,
+      "total_iterations": 4,
+      "successful_executions": 4,
+      "failed_executions": 0,
+      "duplicate_actions_prevented": 0,
+      "tools_used": [
+        "profile_dataset",
+        "pearson_correlation",
+        "correlation_without_outliers",
+        "spearman_correlation"
+      ],
+      "stop_reason": "NO_NEW_ACTIONS",
+      "trace_complete": true,
+      "statistics": {
+        "pearson": 0.9038228434669581,
+        "spearman": 0.8926424825699302,
+        "original_correlation": 0.9038228434669581,
+        "filtered_correlation": 0.8961274894906438,
+        "removed_count": 6,
+        "absolute_change": 0.0076953539763142675
+      },
+      "timing": {
+        "min_execution_ms": 6.780400057323277,
+        "max_execution_ms": 8.383500040508807,
+        "mean_execution_ms": 7.32545000500977,
+        "median_execution_ms": 7.28960003471002,
+        "p95_execution_ms": 8.00970010459423
+      },
+      "execution_times_ms": [
+        7.237200043164194,
+        6.911600008606911,
+        7.770200027152896,
+        7.8301000175997615,
+        7.284100051037967,
+        7.479700027033687,
+        7.299099932424724,
+        7.160599925555289,
+        7.2951000183820724,
+        6.977099925279617,
+        7.487599970772862,
+        6.921499967575073,
+        7.4087000684812665,
+        6.992799928411841,
+        8.00970010459423,
+        6.958200014196336,
+        6.780400057323277,
+        8.383500040508807,
+        6.84489996638149,
+        7.476900005713105
+      ]
+    },
+    {
+      "scenario": "confounded_relation",
+      "rows": 500,
+      "expected_behavior": "The X-Y association decreases substantially after controlling an additional numeric variable.",
+      "correct_behavior_detected": true,
+      "functional_reproducibility": true,
+      "total_iterations": 5,
+      "successful_executions": 5,
+      "failed_executions": 0,
+      "duplicate_actions_prevented": 0,
+      "tools_used": [
+        "profile_dataset",
+        "pearson_correlation",
+        "partial_correlation",
+        "correlation_without_outliers",
+        "spearman_correlation"
+      ],
+      "stop_reason": "NO_NEW_ACTIONS",
+      "trace_complete": true,
+      "statistics": {
+        "pearson": 0.8316728672082654,
+        "spearman": 0.8248320353281413,
+        "original_correlation": 0.8316728672082654,
+        "filtered_correlation": 0.8168993167284878,
+        "removed_count": 8,
+        "absolute_change": 0.014773550479777575,
+        "partial_correlation": 0.01840456913140411,
+        "partial_absolute_change": 0.8132682980768613,
+        "partial_relative_reduction": 0.9778704225458454
+      },
+      "timing": {
+        "min_execution_ms": 8.766600047238171,
+        "max_execution_ms": 22.968700039200485,
+        "mean_execution_ms": 10.19432001048699,
+        "median_execution_ms": 9.473350015468895,
+        "p95_execution_ms": 11.020899983122945
+      },
+      "execution_times_ms": [
+        22.968700039200485,
+        8.833499974571168,
+        9.490400087088346,
+        9.270999929867685,
+        9.381000068970025,
+        9.68799996189773,
+        9.040500037372112,
+        10.365900001488626,
+        9.195200051181018,
+        9.284300031140447,
+        9.771800017915666,
+        11.020899983122945,
+        10.509700048714876,
+        9.681700030341744,
+        9.461299981921911,
+        9.48540004901588,
+        8.823099895380437,
+        9.49550000950694,
+        8.766600047238171,
+        9.35189996380359
+      ]
+    },
+    {
+      "scenario": "outlier_relation",
+      "rows": 500,
+      "expected_behavior": "The X-Y association decreases substantially after removing detected extreme observations.",
+      "correct_behavior_detected": true,
+      "functional_reproducibility": true,
+      "total_iterations": 4,
+      "successful_executions": 4,
+      "failed_executions": 0,
+      "duplicate_actions_prevented": 0,
+      "tools_used": [
+        "profile_dataset",
+        "pearson_correlation",
+        "correlation_without_outliers",
+        "spearman_correlation"
+      ],
+      "stop_reason": "NO_NEW_ACTIONS",
+      "trace_complete": true,
+      "statistics": {
+        "pearson": 0.8880811451159007,
+        "spearman": 0.36544235776943107,
+        "original_correlation": 0.8880811451159007,
+        "filtered_correlation": 0.2800630244728004,
+        "removed_count": 29,
+        "absolute_change": 0.6080181206431003
+      },
+      "timing": {
+        "min_execution_ms": 6.597699946723878,
+        "max_execution_ms": 7.689299993216991,
+        "mean_execution_ms": 7.083164982032031,
+        "median_execution_ms": 7.048599945846945,
+        "p95_execution_ms": 7.654599961824715
+      },
+      "execution_times_ms": [
+        7.04349996522069,
+        7.158799911849201,
+        7.297900039702654,
+        6.924399989657104,
+        6.669200025498867,
+        7.012800080701709,
+        7.340000011026859,
+        6.597699946723878,
+        7.654599961824715,
+        6.863799993880093,
+        7.114399923011661,
+        7.0536999264732,
+        7.689299993216991,
+        6.83159998152405,
+        7.467899937182665,
+        6.80660002399236,
+        6.97099999524653,
+        7.168099982663989,
+        6.651500007137656,
+        7.346499944105744
+      ]
+    }
+  ],
+  "global_metrics": {
+    "total_scenarios": 3,
+    "successful_scenarios": 3,
+    "success_rate": 100.0,
+    "total_iterations": 13,
+    "mean_iterations_per_scenario": 4.333333333333333,
+    "min_iterations": 4,
+    "max_iterations": 5,
+    "total_tool_executions": 13,
+    "total_failed_executions": 0,
+    "total_duplicate_actions_prevented": 0,
+    "mean_execution_ms": 8.200978332509598,
+    "median_execution_ms": 7.438300002831966,
+    "unique_execution_paths": 2,
+    "distinct_tools_used": 5,
+    "execution_paths": {
+      "consistent_relation": [
+        "profile_dataset",
+        "pearson_correlation",
+        "correlation_without_outliers",
+        "spearman_correlation"
+      ],
+      "confounded_relation": [
+        "profile_dataset",
+        "pearson_correlation",
+        "partial_correlation",
+        "correlation_without_outliers",
+        "spearman_correlation"
+      ],
+      "outlier_relation": [
+        "profile_dataset",
+        "pearson_correlation",
+        "correlation_without_outliers",
+        "spearman_correlation"
+      ]
+    }
+  },
+  "control": {
+    "registered_tools_count": 7,
+    "arbitrary_tool_blocked": true
+  },
+  "robustness": {
+    "duplicate_protection": true,
+    "max_iteration_protection": true,
+    "execution_error_handling": true,
+    "input_validation": true
+  },
+  "structural_metrics": {
+    "productive_python_modules": 6,
+    "approximate_productive_loc": 901,
+    "test_functions": 90,
+    "registered_tools": 7
+  }
+}

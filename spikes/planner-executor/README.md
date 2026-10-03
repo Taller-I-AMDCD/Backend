@@ -144,3 +144,15 @@ Las defensas pueden demostrarse de manera aislada con:
 ```text
 python -m src.demo_robustness
 ```
+
+## Final evaluation
+
+The final evaluation runs the consistent, confounded, and outlier scenarios with identical Planner–Executor configuration. Each scenario uses three warm-ups followed by twenty measured repetitions, while verifying that every repetition preserves the same functional trace.
+
+Run the evaluation from `spikes/planner-executor`:
+
+```text
+python -m evaluation.run_evaluation
+```
+
+The command writes consolidated metrics to `results/evaluation/planner_executor_metrics.json` and one import-friendly row per scenario to `results/evaluation/planner_executor_scenarios.csv`. The output provides quantitative evidence only and does not rank this architecture against alternatives.
