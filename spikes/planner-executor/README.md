@@ -110,3 +110,23 @@ La demostración independiente del Planner se ejecuta desde `spikes/planner-exec
 ```text
 python -m src.demo_planner
 ```
+
+## Integrated Planner–Executor loop
+
+El orquestador conecta los componentes sin asumir sus responsabilidades: entrega el estado al Planner, convierte cada decisión en una solicitud para el Executor, incorpora la respuesta al estado y conserva la trazabilidad hasta recibir una decisión de parada.
+
+El ciclo mantiene por separado la decisión, la ejecución y la actualización del estado:
+
+```text
+Dataset → State → Planner → Executor → State → Planner → Stop
+```
+
+Cada ejecución registra las decisiones, razones, parámetros, respuestas, errores, metadata del estado y métricas finales. La traza completa se guarda como JSON en `results/<dataset>_run.json`.
+
+Desde `spikes/planner-executor`, un dataset puede procesarse con:
+
+```text
+python -m src.main --dataset data/confounded_relation.csv --x X --y Y
+```
+
+El límite puede ajustarse con `--max-iterations`; su valor predeterminado es `8`. Esta integración recopila evidencia analítica y no asigna clasificaciones finales a las relaciones estudiadas.

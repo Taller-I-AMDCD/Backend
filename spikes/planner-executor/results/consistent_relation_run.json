@@ -1,0 +1,214 @@
+{
+  "dataset": "data/consistent_relation.csv",
+  "objective": "Evaluate the association between X and Y.",
+  "target_variables": {
+    "x": "X",
+    "y": "Y"
+  },
+  "iterations": [
+    {
+      "iteration": 1,
+      "planner": {
+        "action_id": "action-001",
+        "tool": "profile_dataset",
+        "parameters": {},
+        "reason": "Obtain the initial dataset structure before selecting statistical analyses."
+      },
+      "executor": {
+        "status": "success",
+        "tool": "profile_dataset",
+        "parameters": {},
+        "result": {
+          "row_count": 500,
+          "column_count": 2,
+          "columns": [
+            "X",
+            "Y"
+          ],
+          "numeric_columns": [
+            "X",
+            "Y"
+          ],
+          "missing_values": {
+            "X": 0,
+            "Y": 0
+          },
+          "duplicate_rows": 0,
+          "numeric_summary": {
+            "X": {
+              "count": 500,
+              "mean": -0.01968922569939998,
+              "std": 1.4399011789261804,
+              "min": -3.8499876614,
+              "25%": -1.0003760247,
+              "50%": 0.00481759155,
+              "75%": 0.8810899938,
+              "max": 4.370793699
+            },
+            "Y": {
+              "count": 500,
+              "mean": -0.08902894809119997,
+              "std": 2.8557726062547113,
+              "min": -8.8252296148,
+              "25%": -2.131009361275,
+              "50%": 0.1131910452,
+              "75%": 1.746085909425,
+              "max": 8.4968375086
+            }
+          }
+        },
+        "error": null
+      },
+      "state": {
+        "iteration": 1,
+        "columns": [
+          "X",
+          "Y"
+        ],
+        "numeric_columns": [
+          "X",
+          "Y"
+        ],
+        "history_size": 1,
+        "results_size": 1
+      }
+    },
+    {
+      "iteration": 2,
+      "planner": {
+        "action_id": "action-002",
+        "tool": "pearson_correlation",
+        "parameters": {
+          "x": "X",
+          "y": "Y"
+        },
+        "reason": "Establish the initial association magnitude between the target variables."
+      },
+      "executor": {
+        "status": "success",
+        "tool": "pearson_correlation",
+        "parameters": {
+          "x": "X",
+          "y": "Y"
+        },
+        "result": {
+          "x": "X",
+          "y": "Y",
+          "coefficient": 0.9038228434669581,
+          "sample_size": 500
+        },
+        "error": null
+      },
+      "state": {
+        "iteration": 2,
+        "columns": [
+          "X",
+          "Y"
+        ],
+        "numeric_columns": [
+          "X",
+          "Y"
+        ],
+        "history_size": 2,
+        "results_size": 2
+      }
+    },
+    {
+      "iteration": 3,
+      "planner": {
+        "action_id": "action-003",
+        "tool": "correlation_without_outliers",
+        "parameters": {
+          "x": "X",
+          "y": "Y"
+        },
+        "reason": "Check whether the observed association depends on extreme observations."
+      },
+      "executor": {
+        "status": "success",
+        "tool": "correlation_without_outliers",
+        "parameters": {
+          "x": "X",
+          "y": "Y"
+        },
+        "result": {
+          "x": "X",
+          "y": "Y",
+          "method": "IQR",
+          "multiplier": 1.5,
+          "original_correlation": 0.9038228434669581,
+          "filtered_correlation": 0.8961274894906438,
+          "removed_count": 6,
+          "original_sample_size": 500,
+          "filtered_sample_size": 494
+        },
+        "error": null
+      },
+      "state": {
+        "iteration": 3,
+        "columns": [
+          "X",
+          "Y"
+        ],
+        "numeric_columns": [
+          "X",
+          "Y"
+        ],
+        "history_size": 3,
+        "results_size": 3
+      }
+    },
+    {
+      "iteration": 4,
+      "planner": {
+        "action_id": "action-004",
+        "tool": "spearman_correlation",
+        "parameters": {
+          "x": "X",
+          "y": "Y"
+        },
+        "reason": "Contrast association stability using a rank-based metric."
+      },
+      "executor": {
+        "status": "success",
+        "tool": "spearman_correlation",
+        "parameters": {
+          "x": "X",
+          "y": "Y"
+        },
+        "result": {
+          "x": "X",
+          "y": "Y",
+          "coefficient": 0.8926424825699302,
+          "sample_size": 500
+        },
+        "error": null
+      },
+      "state": {
+        "iteration": 4,
+        "columns": [
+          "X",
+          "Y"
+        ],
+        "numeric_columns": [
+          "X",
+          "Y"
+        ],
+        "history_size": 4,
+        "results_size": 4
+      }
+    }
+  ],
+  "final": {
+    "stop_reason": "NO_NEW_ACTIONS",
+    "total_iterations": 4,
+    "successful_executions": 4,
+    "failed_executions": 0,
+    "tools_used": [
+      "profile_dataset",
+      "pearson_correlation",
+      "correlation_without_outliers",
+      "spearman_correlation"
+    ]
+  }
+}
