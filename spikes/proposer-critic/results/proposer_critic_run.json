@@ -1,0 +1,207 @@
+[
+  {
+    "scenario": "consistent_relation",
+    "iterations": 2,
+    "history": [
+      {
+        "iteration": 1,
+        "proposal": {
+          "agent": "Proposer",
+          "stage": "initial",
+          "hypothesis": "Existe una relación entre X y Y.",
+          "action": "pearson_correlation",
+          "parameters": {
+            "x": "X",
+            "y": "Y"
+          },
+          "reason": "Evaluar la asociación inicial entre las variables."
+        },
+        "result": {
+          "tool": "pearson_correlation",
+          "x": "X",
+          "y": "Y",
+          "coefficient": 0.9326,
+          "observations": 500
+        },
+        "critic": {
+          "agent": "Critic",
+          "decision": "REQUEST_MORE_EVIDENCE",
+          "reason": "La asociación es fuerte; se requiere comprobar su robustez frente a valores atípicos.",
+          "next_action": "correlation_without_outliers",
+          "parameters": {
+            "x": "X",
+            "y": "Y"
+          }
+        }
+      },
+      {
+        "iteration": 2,
+        "proposal": {
+          "agent": "Proposer",
+          "stage": "follow_up",
+          "hypothesis": "La relación requiere evidencia adicional.",
+          "action": "correlation_without_outliers",
+          "parameters": {
+            "x": "X",
+            "y": "Y"
+          },
+          "reason": "La asociación es fuerte; se requiere comprobar su robustez frente a valores atípicos."
+        },
+        "result": {
+          "tool": "correlation_without_outliers",
+          "x": "X",
+          "y": "Y",
+          "original_correlation": 0.9326,
+          "filtered_correlation": 0.9271,
+          "removed_observations": 6,
+          "remaining_observations": 494
+        },
+        "critic": {
+          "agent": "Critic",
+          "decision": "ACCEPT",
+          "reason": "La asociación se mantiene después de controlar los valores atípicos.",
+          "next_action": null,
+          "parameters": {}
+        }
+      }
+    ],
+    "final_decision": "ACCEPT"
+  },
+  {
+    "scenario": "confounded_relation",
+    "iterations": 2,
+    "history": [
+      {
+        "iteration": 1,
+        "proposal": {
+          "agent": "Proposer",
+          "stage": "initial",
+          "hypothesis": "Existe una relación entre X y Y.",
+          "action": "pearson_correlation",
+          "parameters": {
+            "x": "X",
+            "y": "Y"
+          },
+          "reason": "Evaluar la asociación inicial entre las variables."
+        },
+        "result": {
+          "tool": "pearson_correlation",
+          "x": "X",
+          "y": "Y",
+          "coefficient": 0.7663,
+          "observations": 500
+        },
+        "critic": {
+          "agent": "Critic",
+          "decision": "REQUEST_MORE_EVIDENCE",
+          "reason": "Existe una posible variable de confusión: Z.",
+          "next_action": "partial_correlation",
+          "parameters": {
+            "x": "X",
+            "y": "Y",
+            "control": "Z"
+          }
+        }
+      },
+      {
+        "iteration": 2,
+        "proposal": {
+          "agent": "Proposer",
+          "stage": "follow_up",
+          "hypothesis": "La relación requiere evidencia adicional.",
+          "action": "partial_correlation",
+          "parameters": {
+            "x": "X",
+            "y": "Y",
+            "control": "Z"
+          },
+          "reason": "Existe una posible variable de confusión: Z."
+        },
+        "result": {
+          "tool": "partial_correlation",
+          "x": "X",
+          "y": "Y",
+          "control": "Z",
+          "coefficient": 0.0009,
+          "observations": 500
+        },
+        "critic": {
+          "agent": "Critic",
+          "decision": "REJECT_SPURIOUS",
+          "reason": "La asociación disminuye al controlar la variable de confusión y puede considerarse espuria.",
+          "next_action": null,
+          "parameters": {}
+        }
+      }
+    ],
+    "final_decision": "REJECT_SPURIOUS"
+  },
+  {
+    "scenario": "outlier_relation",
+    "iterations": 2,
+    "history": [
+      {
+        "iteration": 1,
+        "proposal": {
+          "agent": "Proposer",
+          "stage": "initial",
+          "hypothesis": "Existe una relación entre X y Y.",
+          "action": "pearson_correlation",
+          "parameters": {
+            "x": "X",
+            "y": "Y"
+          },
+          "reason": "Evaluar la asociación inicial entre las variables."
+        },
+        "result": {
+          "tool": "pearson_correlation",
+          "x": "X",
+          "y": "Y",
+          "coefficient": 0.8595,
+          "observations": 500
+        },
+        "critic": {
+          "agent": "Critic",
+          "decision": "REQUEST_MORE_EVIDENCE",
+          "reason": "La asociación es fuerte; se requiere comprobar su robustez frente a valores atípicos.",
+          "next_action": "correlation_without_outliers",
+          "parameters": {
+            "x": "X",
+            "y": "Y"
+          }
+        }
+      },
+      {
+        "iteration": 2,
+        "proposal": {
+          "agent": "Proposer",
+          "stage": "follow_up",
+          "hypothesis": "La relación requiere evidencia adicional.",
+          "action": "correlation_without_outliers",
+          "parameters": {
+            "x": "X",
+            "y": "Y"
+          },
+          "reason": "La asociación es fuerte; se requiere comprobar su robustez frente a valores atípicos."
+        },
+        "result": {
+          "tool": "correlation_without_outliers",
+          "x": "X",
+          "y": "Y",
+          "original_correlation": 0.8595,
+          "filtered_correlation": 0.0294,
+          "removed_observations": 33,
+          "remaining_observations": 467
+        },
+        "critic": {
+          "agent": "Critic",
+          "decision": "REJECT_SPURIOUS",
+          "reason": "La asociación cambia significativamente después de eliminar los valores atípicos.",
+          "next_action": null,
+          "parameters": {}
+        }
+      }
+    ],
+    "final_decision": "REJECT_SPURIOUS"
+  }
+]
