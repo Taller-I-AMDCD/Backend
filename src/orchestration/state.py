@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 from .contracts import ExecutionId, ExecutionStatus
+from .exceptions import InvalidIdentifierError, InvalidStateTransitionError
 
 
 _VALID_TRANSITIONS: dict[ExecutionStatus, frozenset[ExecutionStatus]] = {
@@ -30,7 +31,7 @@ class ExecutionState:
 
     def __post_init__(self) -> None:
         if not isinstance(self.execution_id, str) or not self.execution_id.strip():
-            raise ValueError("execution_id must be a non-empty string")
+            raise InvalidIdentifierError("execution_id must be a non-empty string")
         self.metadata = dict(self.metadata)
         self.set_current_step(self.current_step)
 
@@ -38,7 +39,7 @@ class ExecutionState:
         """Apply an allowed lifecycle transition or reject it explicitly."""
 
         if status not in _VALID_TRANSITIONS[self.status]:
-            raise ValueError(
+            raise InvalidStateTransitionError(
                 f"invalid execution status transition: "
                 f"{self.status.value} -> {status.value}"
             )

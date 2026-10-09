@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Mapping, NewType
 
+from .exceptions import InvalidIdentifierError
+
 
 ExecutionId = NewType("ExecutionId", str)
 ComponentId = NewType("ComponentId", str)
@@ -31,7 +33,7 @@ class ComponentStatus(str, Enum):
 
 def _require_identifier(value: str, field_name: str) -> None:
     if not isinstance(value, str) or not value.strip():
-        raise ValueError(f"{field_name} must be a non-empty string")
+        raise InvalidIdentifierError(f"{field_name} must be a non-empty string")
 
 
 @dataclass(frozen=True, slots=True)

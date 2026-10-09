@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 
 from .contracts import OrchestrationRequest
 from .state import ExecutionState
+from .trace import ExecutionTrace
 
 
 @dataclass(slots=True)
@@ -14,7 +15,8 @@ class ExecutionContext:
 
     request: OrchestrationRequest
     state: ExecutionState
-    data: dict[str, object] = field(default_factory=dict)
+    trace: ExecutionTrace
+    shared_data: dict[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if (
@@ -22,4 +24,6 @@ class ExecutionContext:
             and self.request.execution_id != self.state.execution_id
         ):
             raise ValueError("request and state execution_id values must match")
-        self.data = dict(self.data)
+        if self.trace.execution_id != self.state.execution_id:
+            raise ValueError("trace and state execution_id values must match")
+        self.shared_data = dict(self.shared_data)

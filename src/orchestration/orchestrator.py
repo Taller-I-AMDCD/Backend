@@ -8,6 +8,7 @@ from .contracts import ExecutionId, OrchestrationRequest, OrchestrationResult
 from .context import ExecutionContext
 from .state import ExecutionState
 from .supervisor import Supervisor
+from .trace import ExecutionTrace, TraceEventType
 
 
 class Orchestrator:
@@ -33,6 +34,11 @@ class Orchestrator:
         """Create a pending execution without routing or running components."""
 
         execution_id = request.execution_id or ExecutionId(str(uuid4()))
+        trace = ExecutionTrace(execution_id)
+        trace.record(
+            TraceEventType.EXECUTION_STARTED,
+            metadata=request.metadata,
+        )
         state = ExecutionState(
             execution_id=execution_id,
             metadata=dict(request.metadata),
@@ -41,6 +47,7 @@ class Orchestrator:
         self._context = ExecutionContext(
             request=request,
             state=contextualized_state,
+            trace=trace,
         )
 
         return OrchestrationResult(

@@ -15,6 +15,9 @@ from orchestration import (  # noqa: E402
     ExecutionId,
     ExecutionState,
     ExecutionStatus,
+    ExecutionTrace,
+    InvalidStateTransitionError,
+    OrchestrationError,
     OrchestrationRequest,
     Orchestrator,
 )
@@ -58,15 +61,26 @@ class ExecutionStateTests(unittest.TestCase):
         state = self._running_state()
         state.transition_to(ExecutionStatus.COMPLETED)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidStateTransitionError):
             state.transition_to(ExecutionStatus.RUNNING)
 
     def test_failed_state_cannot_be_reactivated(self) -> None:
         state = self._running_state()
         state.transition_to(ExecutionStatus.FAILED)
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(InvalidStateTransitionError):
             state.transition_to(ExecutionStatus.RUNNING)
+
+    def test_invalid_transition_uses_domain_error(self) -> None:
+        state = ExecutionState(execution_id=ExecutionId("execution-1"))
+
+        with self.assertRaises(InvalidStateTransitionError):
+            state.transition_to(ExecutionStatus.COMPLETED)
+
+    def test_invalid_transition_error_uses_common_base(self) -> None:
+        self.assertTrue(
+            issubclass(InvalidStateTransitionError, OrchestrationError)
+        )
 
     def test_current_step_can_be_updated(self) -> None:
         state = ExecutionState(execution_id=ExecutionId("execution-1"))
@@ -114,11 +128,12 @@ class ExecutionContextTests(unittest.TestCase):
         context = ExecutionContext(
             request=OrchestrationRequest(execution_id=execution_id),
             state=ExecutionState(execution_id=execution_id),
-            data={"shared": "value"},
+            trace=ExecutionTrace(execution_id),
+            shared_data={"shared": "value"},
         )
 
         self.assertEqual(context.state.execution_id, execution_id)
-        self.assertEqual(context.data["shared"], "value")
+        self.assertEqual(context.shared_data["shared"], "value")
 
     def test_context_rejects_mismatched_execution_ids(self) -> None:
         with self.assertRaises(ValueError):
@@ -127,8 +142,16 @@ class ExecutionContextTests(unittest.TestCase):
                     execution_id=ExecutionId("execution-1")
                 ),
                 state=ExecutionState(execution_id=ExecutionId("execution-2")),
+                trace=ExecutionTrace(ExecutionId("execution-2")),
             )
 
+    def test_context_rejects_mismatched_trace_execution_id(self) -> None:
+        with self.assertRaises(ValueError):
+            ExecutionContext(
+                request=OrchestrationRequest(),
+                state=ExecutionState(execution_id=ExecutionId("execution-1")),
+                trace=ExecutionTrace(ExecutionId("execution-2")),
+            )
 
 class OrchestratorIdentityTests(unittest.TestCase):
     def test_orchestrator_preserves_explicit_execution_id(self) -> None:
