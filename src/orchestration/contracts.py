@@ -22,6 +22,18 @@ class ExecutionStatus(str, Enum):
     FAILED = "failed"
 
 
+class ComponentStatus(str, Enum):
+    """Outcome states shared by all future component types."""
+
+    SUCCESS = "success"
+    FAILURE = "failure"
+
+
+def _require_identifier(value: str, field_name: str) -> None:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{field_name} must be a non-empty string")
+
+
 @dataclass(frozen=True, slots=True)
 class OrchestrationRequest:
     """Input accepted by the orchestration boundary."""
@@ -29,6 +41,12 @@ class OrchestrationRequest:
     payload: Payload = field(default_factory=dict)
     metadata: Metadata = field(default_factory=dict)
     execution_id: ExecutionId | None = None
+
+    def __post_init__(self) -> None:
+        if self.execution_id is not None:
+            _require_identifier(self.execution_id, "execution_id")
+        object.__setattr__(self, "payload", dict(self.payload))
+        object.__setattr__(self, "metadata", dict(self.metadata))
 
 
 @dataclass(frozen=True, slots=True)
@@ -40,15 +58,33 @@ class ComponentRequest:
     payload: Payload = field(default_factory=dict)
     metadata: Metadata = field(default_factory=dict)
 
+    def __post_init__(self) -> None:
+        _require_identifier(self.execution_id, "execution_id")
+        _require_identifier(self.component_id, "component_id")
+        object.__setattr__(self, "payload", dict(self.payload))
+        object.__setattr__(self, "metadata", dict(self.metadata))
+
 
 @dataclass(frozen=True, slots=True)
 class ComponentResult:
     """Generic outcome returned by a component."""
 
     component_id: ComponentId
-    succeeded: bool
-    data: Payload = field(default_factory=dict)
+    status: ComponentStatus
+    output: Payload = field(default_factory=dict)
     error: str | None = None
+    metadata: Metadata = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        _require_identifier(self.component_id, "component_id")
+        object.__setattr__(self, "output", dict(self.output))
+        object.__setattr__(self, "metadata", dict(self.metadata))
+
+    @property
+    def succeeded(self) -> bool:
+        """Report success without forcing callers to compare enum values."""
+
+        return self.status is ComponentStatus.SUCCESS
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,6 +93,13 @@ class OrchestrationResult:
 
     execution_id: ExecutionId
     status: ExecutionStatus
+    output: Payload = field(default_factory=dict)
     metadata: Metadata = field(default_factory=dict)
     component_results: tuple[ComponentResult, ...] = ()
     error: str | None = None
+
+    def __post_init__(self) -> None:
+        _require_identifier(self.execution_id, "execution_id")
+        object.__setattr__(self, "output", dict(self.output))
+        object.__setattr__(self, "metadata", dict(self.metadata))
+        object.__setattr__(self, "component_results", tuple(self.component_results))

@@ -15,6 +15,7 @@ sys.path.insert(0, str(SOURCE_ROOT))
 from orchestration import (  # noqa: E402
     ComponentId,
     ComponentResult,
+    ComponentStatus,
     ExecutionId,
     ExecutionState,
     ExecutionStatus,
@@ -42,7 +43,7 @@ class ContractTests(unittest.TestCase):
             component_results=(
                 ComponentResult(
                     component_id=ComponentId("component-1"),
-                    succeeded=True,
+                    status=ComponentStatus.SUCCESS,
                 ),
             ),
         )
@@ -116,7 +117,13 @@ class IndependenceTests(unittest.TestCase):
     def test_candidate_specific_modules_do_not_exist(self) -> None:
         module_directory = SOURCE_ROOT / "orchestration"
 
-        for module_name in ("planner.py", "blackboard.py", "critic.py"):
+        for module_name in (
+            "planner.py",
+            "executor.py",
+            "blackboard.py",
+            "critic.py",
+            "consensus.py",
+        ):
             self.assertFalse((module_directory / module_name).exists())
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@ from __future__ import annotations
 from uuid import uuid4
 
 from .contracts import ExecutionId, OrchestrationRequest, OrchestrationResult
+from .context import ExecutionContext
 from .state import ExecutionState
 from .supervisor import Supervisor
 
@@ -14,13 +15,19 @@ class Orchestrator:
 
     def __init__(self, supervisor: Supervisor | None = None) -> None:
         self._supervisor = supervisor or Supervisor()
-        self._state: ExecutionState | None = None
+        self._context: ExecutionContext | None = None
+
+    @property
+    def context(self) -> ExecutionContext | None:
+        """Return the most recently initialized execution context."""
+
+        return self._context
 
     @property
     def state(self) -> ExecutionState | None:
         """Return the most recently initialized execution state."""
 
-        return self._state
+        return self._context.state if self._context is not None else None
 
     def initialize(self, request: OrchestrationRequest) -> OrchestrationResult:
         """Create a pending execution without routing or running components."""
@@ -30,10 +37,14 @@ class Orchestrator:
             execution_id=execution_id,
             metadata=dict(request.metadata),
         )
-        self._state = self._supervisor.contextualize(state)
+        contextualized_state = self._supervisor.contextualize(state)
+        self._context = ExecutionContext(
+            request=request,
+            state=contextualized_state,
+        )
 
         return OrchestrationResult(
-            execution_id=self._state.execution_id,
-            status=self._state.status,
-            metadata=dict(self._state.metadata),
+            execution_id=self._context.state.execution_id,
+            status=self._context.state.status,
+            metadata=self._context.state.metadata,
         )
