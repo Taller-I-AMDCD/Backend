@@ -13,11 +13,13 @@ from query_execution import (  # noqa: E402
     ExecutionId,
     QueryExecutor,
     Tool,
+    ToolDispatcher,
     ToolError,
     ToolExecutionRequest,
     ToolExecutionResult,
     ToolExecutionStatus,
     ToolId,
+    ToolRegistry,
     ToolSpec,
 )
 
@@ -152,14 +154,17 @@ class ContractTests(unittest.TestCase):
 
 
 class ToolAndExecutorTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.executor = QueryExecutor(ToolDispatcher(ToolRegistry()))
+
     def test_fake_tool_satisfies_protocol_without_inheritance(self) -> None:
         self.assertIsInstance(FakeTool(), Tool)
 
     def test_query_executor_can_be_initialized(self) -> None:
-        self.assertIsInstance(QueryExecutor(), QueryExecutor)
+        self.assertIsInstance(self.executor, QueryExecutor)
 
     def test_executor_generates_execution_id(self) -> None:
-        prepared = QueryExecutor().prepare_request(
+        prepared = self.executor.prepare_request(
             ToolExecutionRequest(tool_id=ToolId("profile"))
         )
         self.assertIsInstance(prepared.execution_id, ExecutionId)
@@ -170,12 +175,14 @@ class ToolAndExecutorTests(unittest.TestCase):
             tool_id=ToolId("profile"),
             execution_id=execution_id,
         )
-        self.assertIs(QueryExecutor().prepare_request(request), request)
+        prepared = self.executor.prepare_request(request)
+        self.assertEqual(prepared.execution_id, execution_id)
+        self.assertIsNot(prepared, request)
 
     def test_executor_does_not_execute_tool(self) -> None:
         tool = FakeTool()
         request = ToolExecutionRequest(tool_id=tool.tool_id)
-        prepared = QueryExecutor().prepare_request(request)
+        prepared = self.executor.prepare_request(request)
         self.assertIsNotNone(prepared.execution_id)
 
 
@@ -196,8 +203,10 @@ class IsolationTests(unittest.TestCase):
         module_names = {path.stem for path in self.source_files}
         self.assertTrue({"planner", "blackboard", "critic"}.isdisjoint(module_names))
 
-    def test_dispatcher_is_not_implemented(self) -> None:
-        self.assertFalse((SOURCE_ROOT / "query_execution" / "dispatcher.py").exists())
+    def test_no_productive_analytical_tools_exist(self) -> None:
+        module_names = {path.stem for path in self.source_files}
+        analytical_modules = {"pearson", "spearman", "outliers", "subgroups"}
+        self.assertTrue(analytical_modules.isdisjoint(module_names))
 
     def test_no_arbitrary_execution_mechanisms(self) -> None:
         forbidden = (
