@@ -27,3 +27,11 @@ class ToolNotFoundError(QueryExecutionError):
 
 class InvalidToolError(QueryExecutionError):
     """Raised when an object does not satisfy the tool contract."""
+
+
+class InvalidParametersError(QueryExecutionError):
+    """Raised by a tool when request parameters are not valid for its contract."""
+
+
+class InvalidToolResultError(QueryExecutionError):
+    """Raised internally when a tool returns an inconsistent result."""

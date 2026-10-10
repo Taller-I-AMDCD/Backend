@@ -12,7 +12,9 @@ from .contracts import (
 from .dispatcher import ToolDispatcher
 from .exceptions import (
     DuplicateToolError,
+    InvalidParametersError,
     InvalidToolError,
+    InvalidToolResultError,
     QueryExecutionError,
     ToolNotFoundError,
 )
@@ -23,7 +25,9 @@ from .tool import Tool
 __all__ = [
     "DuplicateToolError",
     "ExecutionId",
+    "InvalidParametersError",
     "InvalidToolError",
+    "InvalidToolResultError",
     "QueryExecutor",
     "QueryExecutionError",
     "Tool",

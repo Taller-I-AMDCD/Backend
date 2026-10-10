@@ -10,7 +10,12 @@ Los Spikes experimentales se mantienen aislados de esta base productiva mientras
 
 La infraestructura de ejecución de herramientas se encuentra en desarrollo.
 `ToolRegistry` mantiene la lista explícita de herramientas permitidas y
-`ToolDispatcher` resuelve solicitudes exclusivamente contra ese registro. La
-ejecución completa en `QueryExecutor` permanece pendiente de la siguiente
-sesión. La selección de herramientas permanece fuera de HU-005 y su integración
-con la arquitectura definitiva se realizará después de aprobar el ADR.
+`ToolDispatcher` resuelve solicitudes exclusivamente contra ese registro. El
+flujo productivo mínimo es `ToolExecutionRequest` → `QueryExecutor` →
+`ToolDispatcher` → `ToolRegistry` → `Tool.execute` → `ToolExecutionResult`.
+
+El ejecutor normaliza los fallos mediante los códigos `UNKNOWN_TOOL`,
+`INVALID_PARAMETERS`, `TOOL_EXECUTION_ERROR` e `INVALID_TOOL_RESULT`. Ejecuta la
+herramienta solicitada, pero no decide cuál debe solicitarse. La selección de
+herramientas permanece fuera de HU-005 y la integración con la arquitectura
+definitiva se realizará después de aprobar el ADR.
