@@ -19,3 +19,7 @@ class InvalidStateTransitionError(OrchestrationError, ValueError):
 
 class InvalidIdentifierError(OrchestrationError, ValueError):
     """Raised when an orchestration identifier is empty or malformed."""
+
+
+class MaxStepsExceededError(OrchestrationError):
+    """Raised when a defective strategy exceeds the defensive step limit."""

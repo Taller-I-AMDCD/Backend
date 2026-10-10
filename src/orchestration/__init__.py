@@ -16,11 +16,17 @@ from .exceptions import (
     DuplicateComponentError,
     InvalidIdentifierError,
     InvalidStateTransitionError,
+    MaxStepsExceededError,
     OrchestrationError,
 )
 from .orchestrator import Orchestrator
 from .registry import Component, ComponentRegistry
 from .state import ExecutionState
+from .strategy import (
+    CoordinationAction,
+    CoordinationDecision,
+    CoordinationStrategy,
+)
 from .supervisor import Supervisor
 from .trace import ExecutionTrace, TraceEntry, TraceEventType
 
@@ -32,6 +38,9 @@ __all__ = [
     "ComponentRegistry",
     "ComponentResult",
     "ComponentStatus",
+    "CoordinationAction",
+    "CoordinationDecision",
+    "CoordinationStrategy",
     "DuplicateComponentError",
     "ExecutionId",
     "ExecutionContext",
@@ -40,6 +49,7 @@ __all__ = [
     "ExecutionTrace",
     "InvalidIdentifierError",
     "InvalidStateTransitionError",
+    "MaxStepsExceededError",
     "OrchestrationRequest",
     "OrchestrationError",
     "OrchestrationResult",
