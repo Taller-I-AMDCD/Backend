@@ -15,7 +15,13 @@ flujo productivo mínimo es `ToolExecutionRequest` → `QueryExecutor` →
 `ToolDispatcher` → `ToolRegistry` → `Tool.execute` → `ToolExecutionResult`.
 
 El ejecutor normaliza los fallos mediante los códigos `UNKNOWN_TOOL`,
-`INVALID_PARAMETERS`, `TOOL_EXECUTION_ERROR` e `INVALID_TOOL_RESULT`. Ejecuta la
-herramienta solicitada, pero no decide cuál debe solicitarse. La selección de
-herramientas permanece fuera de HU-005 y la integración con la arquitectura
-definitiva se realizará después de aprobar el ADR.
+`INVALID_PARAMETERS`, `TOOL_EXECUTION_ERROR`, `INVALID_TOOL_RESULT` y
+`DUPLICATE_EXECUTION`. También conserva una traza ordenada de eventos y mide la
+duración mediante un reloj monotónico. La protección contra IDs duplicados es
+exclusivamente en memoria, local al proceso y a cada instancia; no proporciona
+idempotencia distribuida.
+
+El Query Executor ejecuta la herramienta solicitada, pero no decide cuál debe
+solicitarse. La selección de herramientas permanece fuera de HU-005 y la
+integración con la arquitectura definitiva se realizará después de aprobar el
+ADR.

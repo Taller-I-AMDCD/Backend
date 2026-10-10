@@ -14,6 +14,7 @@ from query_execution import (  # noqa: E402
     ExecutionId,
     InvalidParametersError,
     QueryExecutor,
+    QueryTraceEventType,
     ToolDispatcher,
     ToolError,
     ToolExecutionRequest,
@@ -238,6 +239,10 @@ class QueryExecutorFailureTests(unittest.TestCase):
         self.assertEqual(result.status, ToolExecutionStatus.FAILURE)
         self.assertEqual(result.error.code, "UNKNOWN_TOOL")  # type: ignore[union-attr]
         self.assertNotIn("Traceback", result.error.message)  # type: ignore[union-attr]
+        self.assertEqual(
+            executor.trace.for_execution(result.execution_id)[-1].event_type,
+            QueryTraceEventType.EXECUTION_FAILED,
+        )
 
     def test_unknown_tool_does_not_execute_fallback(self) -> None:
         fallback = EchoTool("fallback")
@@ -249,11 +254,14 @@ class QueryExecutorFailureTests(unittest.TestCase):
 
     def test_invalid_parameters_returns_structured_failure(self) -> None:
         tool = InvalidParametersTool("invalid-parameters")
-        result = build_executor(tool).execute(
-            ToolExecutionRequest(tool_id=tool.tool_id)
-        )
+        executor = build_executor(tool)
+        result = executor.execute(ToolExecutionRequest(tool_id=tool.tool_id))
         self.assertEqual(result.status, ToolExecutionStatus.FAILURE)
         self.assertEqual(result.error.code, "INVALID_PARAMETERS")  # type: ignore[union-attr]
+        self.assertEqual(
+            executor.trace.for_execution(result.execution_id)[-1].event_type,
+            QueryTraceEventType.EXECUTION_FAILED,
+        )
 
     def test_empty_invalid_parameters_error_uses_safe_message(self) -> None:
         tool = EmptyInvalidParametersTool("empty-invalid-parameters")
@@ -268,13 +276,16 @@ class QueryExecutorFailureTests(unittest.TestCase):
 
     def test_unexpected_tool_exception_is_contained(self) -> None:
         tool = ExplodingTool("exploding")
-        result = build_executor(tool).execute(
-            ToolExecutionRequest(tool_id=tool.tool_id)
-        )
+        executor = build_executor(tool)
+        result = executor.execute(ToolExecutionRequest(tool_id=tool.tool_id))
         self.assertEqual(result.status, ToolExecutionStatus.FAILURE)
         self.assertEqual(result.error.code, "TOOL_EXECUTION_ERROR")  # type: ignore[union-attr]
         self.assertIn("controlled diagnostic", result.error.message)  # type: ignore[union-attr]
         self.assertNotIn("Traceback", result.error.message)  # type: ignore[union-attr]
+        self.assertEqual(
+            executor.trace.for_execution(result.execution_id)[-1].event_type,
+            QueryTraceEventType.EXECUTION_FAILED,
+        )
 
     def test_failure_returned_by_tool_is_preserved(self) -> None:
         tool = FailureTool("failure")
@@ -286,35 +297,47 @@ class QueryExecutorFailureTests(unittest.TestCase):
 
     def test_inconsistent_tool_id_is_rejected(self) -> None:
         tool = WrongToolIdTool("wrong-tool-id")
-        result = build_executor(tool).execute(
-            ToolExecutionRequest(tool_id=tool.tool_id)
-        )
+        executor = build_executor(tool)
+        result = executor.execute(ToolExecutionRequest(tool_id=tool.tool_id))
         self.assertEqual(result.status, ToolExecutionStatus.FAILURE)
         self.assertEqual(result.error.code, "INVALID_TOOL_RESULT")  # type: ignore[union-attr]
+        self.assertEqual(
+            executor.trace.for_execution(result.execution_id)[-1].event_type,
+            QueryTraceEventType.EXECUTION_FAILED,
+        )
 
     def test_inconsistent_execution_id_is_rejected(self) -> None:
         tool = WrongExecutionIdTool("wrong-execution-id")
-        result = build_executor(tool).execute(
-            ToolExecutionRequest(tool_id=tool.tool_id)
-        )
+        executor = build_executor(tool)
+        result = executor.execute(ToolExecutionRequest(tool_id=tool.tool_id))
         self.assertEqual(result.status, ToolExecutionStatus.FAILURE)
         self.assertEqual(result.error.code, "INVALID_TOOL_RESULT")  # type: ignore[union-attr]
+        self.assertEqual(
+            executor.trace.for_execution(result.execution_id)[-1].event_type,
+            QueryTraceEventType.EXECUTION_FAILED,
+        )
 
     def test_invalid_result_type_is_rejected(self) -> None:
         tool = InvalidResultTool("invalid-result")
-        result = build_executor(tool).execute(
-            ToolExecutionRequest(tool_id=tool.tool_id)
-        )
+        executor = build_executor(tool)
+        result = executor.execute(ToolExecutionRequest(tool_id=tool.tool_id))
         self.assertEqual(result.status, ToolExecutionStatus.FAILURE)
         self.assertEqual(result.error.code, "INVALID_TOOL_RESULT")  # type: ignore[union-attr]
+        self.assertEqual(
+            executor.trace.for_execution(result.execution_id)[-1].event_type,
+            QueryTraceEventType.EXECUTION_FAILED,
+        )
 
     def test_invalid_result_status_is_rejected(self) -> None:
         tool = InvalidStatusTool("invalid-status")
-        result = build_executor(tool).execute(
-            ToolExecutionRequest(tool_id=tool.tool_id)
-        )
+        executor = build_executor(tool)
+        result = executor.execute(ToolExecutionRequest(tool_id=tool.tool_id))
         self.assertEqual(result.status, ToolExecutionStatus.FAILURE)
         self.assertEqual(result.error.code, "INVALID_TOOL_RESULT")  # type: ignore[union-attr]
+        self.assertEqual(
+            executor.trace.for_execution(result.execution_id)[-1].event_type,
+            QueryTraceEventType.EXECUTION_FAILED,
+        )
 
 
 if __name__ == "__main__":

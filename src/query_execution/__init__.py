@@ -21,6 +21,7 @@ from .exceptions import (
 from .executor import QueryExecutor
 from .registry import ToolRegistry
 from .tool import Tool
+from .trace import QueryExecutionTrace, QueryTraceEntry, QueryTraceEventType
 
 __all__ = [
     "DuplicateToolError",
@@ -29,7 +30,10 @@ __all__ = [
     "InvalidToolError",
     "InvalidToolResultError",
     "QueryExecutor",
+    "QueryExecutionTrace",
     "QueryExecutionError",
+    "QueryTraceEntry",
+    "QueryTraceEventType",
     "Tool",
     "ToolDispatcher",
     "ToolError",
