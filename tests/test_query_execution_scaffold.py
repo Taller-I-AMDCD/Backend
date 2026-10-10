@@ -196,8 +196,10 @@ class IsolationTests(unittest.TestCase):
         module_names = {path.stem for path in self.source_files}
         self.assertTrue({"planner", "blackboard", "critic"}.isdisjoint(module_names))
 
-    def test_dispatcher_is_not_implemented(self) -> None:
-        self.assertFalse((SOURCE_ROOT / "query_execution" / "dispatcher.py").exists())
+    def test_no_productive_analytical_tools_exist(self) -> None:
+        module_names = {path.stem for path in self.source_files}
+        analytical_modules = {"pearson", "spearman", "outliers", "subgroups"}
+        self.assertTrue(analytical_modules.isdisjoint(module_names))
 
     def test_no_arbitrary_execution_mechanisms(self) -> None:
         forbidden = (

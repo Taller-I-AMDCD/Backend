@@ -8,8 +8,9 @@ Los Spikes experimentales se mantienen aislados de esta base productiva mientras
 
 ## HU-005 — Query Execution
 
-La infraestructura de ejecución de herramientas se encuentra en desarrollo. El
-Query Executor preparará y ejecutará solicitudes controladas, mientras que la
-decisión sobre qué herramienta utilizar permanecerá en una capa superior. Su
-integración con la arquitectura definitiva se realizará después de aprobar el
-ADR correspondiente.
+La infraestructura de ejecución de herramientas se encuentra en desarrollo.
+`ToolRegistry` mantiene la lista explícita de herramientas permitidas y
+`ToolDispatcher` resuelve solicitudes exclusivamente contra ese registro. La
+ejecución completa en `QueryExecutor` permanece pendiente de la siguiente
+sesión. La selección de herramientas permanece fuera de HU-005 y su integración
+con la arquitectura definitiva se realizará después de aprobar el ADR.
